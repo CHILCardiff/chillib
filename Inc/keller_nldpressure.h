@@ -9,6 +9,7 @@
 #ifndef KELLER_NLD
 #define KELLER_NLD
 
+#include "chillib.h"
 #include "stm32l4xx_hal.h"
 #include "stm32l4xx_hal_i2c.h"
 #include "stm32l4xx_hal_i2c_ex.h"
@@ -83,9 +84,9 @@ typedef struct keller_pressure {
 
 void keller_pressure_init_full(keller_pressure* sensor, I2C_HandleTypeDef* i2c, uint8_t i2c_addr, uint16_t timeout);
 void keller_pressure_init(keller_pressure* sensor, I2C_HandleTypeDef* i2c);
-uint8_t keller_read_memory_word(keller_pressure* sensor, uint8_t memory_addr, uint16_t* buffer);
-uint8_t keller_read_memory(keller_pressure* sensor);
+CHIL_STATUS keller_read_memory_word(keller_pressure* sensor, uint8_t memory_addr, uint16_t* buffer);
+CHIL_STATUS keller_read_memory(keller_pressure* sensor);
 
-uint8_t keller_measure(keller_pressure* sensor, keller_pressure_result* result);
+CHIL_STATUS keller_measure(keller_pressure* sensor, keller_pressure_result* result);
 
 #endif

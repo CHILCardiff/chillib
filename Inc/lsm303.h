@@ -5,10 +5,12 @@
  *      Author: J. D. Hawkins
  */
 
-#ifndef INC_LSM303_H_
-#define INC_LSM303_H_
+#ifndef LSM303_H
+#define LSM303_H
 
+#include "chillib.h"
 #include "stm32l4xx_hal.h"
+#include "stm32l4xx_hal_cortex.h"
 
 // Define I2C addresses
 #ifndef ADDR_LSM303ACC
@@ -156,14 +158,37 @@ typedef union {
 	uint8_t value;
 } lsm303_fifo_ctrl_reg_a;
 
+typedef struct lsm303_data_3axis {
+	int16_t x;
+	int16_t y;
+	int16_t z;
+} lsm303_data_3axis;
+
 #define LSM303_ACC_FIFO_MODE_BYPASS         0b00
 #define LSM303_ACC_FIFO_MODE_FIFO           0b01
 #define LSM303_ACC_FIFO_MODE_STREAM         0b10
 #define LSM303_ACC_FIFO_MODE_STREAM_TO_FIFO 0b11
 
+#define LSM303_ADDR_OUTX_L_A 0x28
+#define LSM303_ADDR_OUTX_H_A 0x29
+#define LSM303_ADDR_OUTY_L_A 0x2A
+#define LSM303_ADDR_OUTY_H_A 0x2B
+#define LSM303_ADDR_OUTZ_L_A 0x2C
+#define LSM303_ADDR_OUTZ_H_A 0x2D
+
+#define LSM303_ADDR_OUTX_L_REG_M 0x68
+#define LSM303_ADDR_OUTX_H_REG_M 0x69
+#define LSM303_ADDR_OUTY_L_REG_M 0x6A
+#define LSM303_ADDR_OUTY_H_REG_M 0x6B
+#define LSM303_ADDR_OUTZ_L_REG_M 0x6C
+#define LSM303_ADDR_OUTZ_H_REG_M 0x6D
+
 /*****************************************************************************/
 typedef struct lsm303_config {
+	// STM32/HAL
 	I2C_HandleTypeDef* i2c_handle;
+
+	// Hardware registers
 	lsm303_cfg_reg_a_m cfg_reg_a_m;
 	lsm303_cfg_reg_c_m cfg_reg_c_m;
 	lsm303_ctrl_reg1_a ctrl_reg1_a;
@@ -171,6 +196,8 @@ typedef struct lsm303_config {
 	lsm303_ctrl_reg4_a ctrl_reg4_a;
 	lsm303_ctrl_reg5_a ctrl_reg5_a;
 	lsm303_fifo_ctrl_reg_a fifo_ctrl_reg_a;
+
+	// Auxiliary variables
 	uint8_t buffer_length;
 	volatile uint8_t data_available;
 	volatile uint8_t enabled;
@@ -178,19 +205,23 @@ typedef struct lsm303_config {
 } lsm303_config;
 /*****************************************************************************/
 
-uint8_t lsm303_enable(lsm303_config* config);
-void lsm303_disable(lsm303_config* config);
+CHIL_STATUS lsm303_enable(lsm303_config* config);
+CHIL_STATUS lsm303_disable(lsm303_config* config);
 
-void init_lsm303_config(lsm303_config* config, I2C_HandleTypeDef* i2c, uint8_t buffer_length);
+CHIL_STATUS lsm303_init_config(lsm303_config* config, I2C_HandleTypeDef* i2c, uint8_t buffer_length);
 
 // Generic read-write commands
-uint8_t write_lsm303_reg(lsm303_config* config, uint8_t acc0_mag1, uint8_t reg_addr, uint8_t value);
-uint8_t  read_lsm303_reg(lsm303_config* config, uint8_t acc0_mag1, uint8_t reg_addr, uint8_t* buffer, uint8_t len);
+CHIL_STATUS write_lsm303_reg(lsm303_config* config, uint8_t acc0_mag1, uint8_t reg_addr, uint8_t value);
+CHIL_STATUS  read_lsm303_reg(lsm303_config* config, uint8_t acc0_mag1, uint8_t reg_addr, uint8_t* buffer, uint8_t len);
 // Accelerometer/magnetometer specific read-write commands
-uint8_t write_lsm303_acc_reg(lsm303_config* config, uint8_t reg_addr, uint8_t value);
-uint8_t write_lsm303_mag_reg(lsm303_config* config, uint8_t reg_addr, uint8_t value);
-uint8_t  read_lsm303_acc_reg(lsm303_config* config, uint8_t reg_addr, uint8_t* buffer, uint8_t len);
-uint8_t  read_lsm303_mag_reg(lsm303_config* config, uint8_t reg_addr, uint8_t* buffer, uint8_t len);
+CHIL_STATUS write_lsm303_acc_reg(lsm303_config* config, uint8_t reg_addr, uint8_t value);
+CHIL_STATUS write_lsm303_mag_reg(lsm303_config* config, uint8_t reg_addr, uint8_t value);
+CHIL_STATUS  read_lsm303_acc_reg(lsm303_config* config, uint8_t reg_addr, uint8_t* buffer, uint8_t len);
+CHIL_STATUS  read_lsm303_mag_reg(lsm303_config* config, uint8_t reg_addr, uint8_t* buffer, uint8_t len);
+
+CHIL_STATUS read_lsm303_data(lsm303_config* config, lsm303_data_3axis* data, uint8_t acc0_mag1);
+CHIL_STATUS read_lsm303_acc_data(lsm303_config* config, lsm303_data_3axis* data);
+CHIL_STATUS read_lsm303_mag_data(lsm303_config* config, lsm303_data_3axis* data);
 
 void lsm303_callback(lsm303_config* config, uint8_t* buffer);
 
