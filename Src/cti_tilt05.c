@@ -51,82 +51,63 @@ CHIL_STATUS cti_tilt05_init(cti_tilt05_config* config, UART_HandleTypeDef* uart,
 
 	// Assign UART handle
 	config->uart = uart;
+
 	// Assign default state variables
 	config->state = IDLE;
 	config->block_type = MESSAGE_IDENT;
 	config->unit_id = 1;
 
+	config->tx_busy = 0;
+	config->rx_busy = 0;
+
+	// Register callbacks
+	memset(config->tx_buffer, 0, CTI_TILT05_BUFFER_TX);
+	memset(config->rx_buffer, 0, CTI_TILT05_BUFFER_RX);
+
+	__HAL_UART_FLUSH_DRREGISTER(config->uart);
 	__HAL_UART_CLEAR_FLAG(config->uart, UART_CLEAR_OREF);
 	__HAL_UART_CLEAR_FLAG(config->uart, UART_CLEAR_FEF);
 
-	// For command reference see Table I:
-	// > https://ctisensors.com/Documents/TILT-05-Datasheet.pdf
+	uint8_t received = 0;
+	status = HAL_UARTEx_ReceiveToIdle(config->uart, config->rx_buffer, CTI_TILT05_BUFFER_RX, &received, CTI_TILT05_TIMEOUT);
 
-	// Set acceleration range
-	uint8_t acc_range_sanitised = cti_tilt05_sanitise_accelerometer_range(acc_range);
-	uint8_t buffer[16];
-//	memset(buffer, 0, 16);
-//	sprintf((char*)buffer, "[%cAR%c\r",
-//		'0' + config->unit_id, // Set unit ID
-//		'0' + acc_range_sanitised);
-//
-//	status = HAL_UART_Transmit(config->uart, buffer, strlen((char*)buffer), 100);
-//	if (status != HAL_OK) return CHIL_ERROR;
-//	// Try and flush the received register
-//	HAL_UART_Receive(config->uart, buffer, 1, CTI_TILT05_TIMEOUT);
-//	HAL_Delay(50);
-//	__HAL_UART_FLUSH_DRREGISTER(config->uart);
-//
-//	// Set data rate
-//	uint8_t data_rate_sanitised = cti_tilt05_sanitise_data_rate(data_rate_Hz);
-//	sprintf((char*)buffer, "[%cD%d\r",
-//		'0' + config->unit_id,
-//		data_rate_sanitised);
-//
-//	status = HAL_UART_Transmit(config->uart, buffer, strlen((char*)buffer), 100);
-//	if (status != HAL_OK) return CHIL_ERROR;
-//	// Try and flush the received register
-//	HAL_UART_Receive(config->uart, buffer, 1, CTI_TILT05_TIMEOUT);
-//	HAL_Delay(50);
-//	__HAL_UART_FLUSH_DRREGISTER(config->uart);
+	sprintf(config->tx_buffer, "[%cMIX\r", '0' + config->unit_id);
+	status = HAL_UART_Transmit(config->uart, config->tx_buffer, 6, CTI_TILT05_TIMEOUT);
+	if (status != HAL_OK) {
+		return CHIL_ERROR;
+	}
+	status = HAL_UARTEx_ReceiveToIdle(config->uart, config->rx_buffer, CTI_TILT05_BUFFER_RX, &received, CTI_TILT05_TIMEOUT);
+	DEBUG_PRINTF("[After 1MIX]: %s\n", config->rx_buffer);
 
-	// Setup output messages to one off
-	sprintf((char*)buffer,"[%cMIS\r",
-		'0' + config->unit_id);
-	status = HAL_UART_Transmit(config->uart, buffer, strlen((char*)buffer), 100);
-	if (status != HAL_OK) return CHIL_ERROR;
-	// Try and flush the received register
-	HAL_UART_Receive(config->uart, buffer, 1, CTI_TILT05_TIMEOUT);
-	HAL_Delay(50);
-	__HAL_UART_FLUSH_DRREGISTER(config->uart);
+	sprintf(config->tx_buffer, "[%cMAX\r", '0' + config->unit_id);
+	status = HAL_UART_Transmit(config->uart, config->tx_buffer, 6, CTI_TILT05_TIMEOUT);
+	if (status != HAL_OK) {
+		return CHIL_ERROR;
+	}
+	status = HAL_UARTEx_ReceiveToIdle(config->uart, config->rx_buffer, CTI_TILT05_BUFFER_RX, &received, CTI_TILT05_TIMEOUT);
+	DEBUG_PRINTF("[After 1MAX]: %s\n", config->rx_buffer);
 
-	sprintf((char*)buffer,"[%cMAS\r",
-		'0' + config->unit_id);
-	status = HAL_UART_Transmit(config->uart, buffer, strlen((char*)buffer), 100);
-	if (status != HAL_OK) return CHIL_ERROR;
-	// Try and flush the received register
-	HAL_UART_Receive(config->uart, buffer, 1, CTI_TILT05_TIMEOUT);
-	HAL_Delay(50);
-	__HAL_UART_FLUSH_DRREGISTER(config->uart);
+	sprintf(config->tx_buffer, "[%cD20\r", '0' + config->unit_id);
+	status = HAL_UART_Transmit(config->uart, config->tx_buffer, 6, CTI_TILT05_TIMEOUT);
+	if (status != HAL_OK) {
+		return CHIL_ERROR;
+	}
+	status = HAL_UARTEx_ReceiveToIdle(config->uart, config->rx_buffer, CTI_TILT05_BUFFER_RX, &received, CTI_TILT05_TIMEOUT);
+	DEBUG_PRINTF("[After 1MAX]: %s\n", config->rx_buffer);
 
-//	// Setup output messages to one off
-//	sprintf((char*)buffer,"[%cMICFW\r",
-//		'0' + config->unit_id);
-//	status = HAL_UART_Transmit(config->uart, buffer, strlen((char*)buffer), 100);
-//	if (status != HAL_OK) return CHIL_ERROR;
-//	// Try and flush the received register
-//	HAL_UART_Receive(config->uart, buffer, 1, CTI_TILT05_TIMEOUT);
-//	HAL_Delay(50);
 //	__HAL_UART_FLUSH_DRREGISTER(config->uart);
-//
-//	sprintf((char*)buffer,"[%cMACFW\r",
-//		'0' + config->unit_id);
-//	status = HAL_UART_Transmit(config->uart, buffer, strlen((char*)buffer), 100);
-//	if (status != HAL_OK) return CHIL_ERROR;
-//	// Try and flush the received register
-//	HAL_UART_Receive(config->uart, buffer, 1, CTI_TILT05_TIMEOUT);
-//	HAL_Delay(50);
-//	__HAL_UART_FLUSH_DRREGISTER(config->uart);
+//	__HAL_UART_CLEAR_FLAG(config->uart, UART_CLEAR_OREF);
+//	__HAL_UART_CLEAR_FLAG(config->uart, UART_CLEAR_FEF);
+
+//	sprintf(config->tx_buffer, "[%cMAX\r", '0' + config->unit_id);
+//	status = HAL_UART_Transmit(config->uart, config->tx_buffer, 6, CTI_TILT05_TIMEOUT);
+//	status = HAL_UARTEx_ReceiveToIdle(config->uart, config->rx_buffer, CTI_TILT05_BUFFER_RX, &received, CTI_TILT05_TIMEOUT);
+//	DEBUG_PRINTF("[After 1MAX]: %s\n", config->rx_buffer);
+
+//	while (received > 0) {
+//		HAL_UARTEx_ReceiveToIdle(config->uart, config->rx_buffer, CTI_TILT05_BUFFER_RX, &received, CTI_TILT05_TIMEOUT);
+//		if (received > 0) DEBUG_PRINTF("%s\n", config->rx_buffer);
+//	}
 
 	return CHIL_OK;
 
@@ -134,60 +115,78 @@ CHIL_STATUS cti_tilt05_init(cti_tilt05_config* config, UART_HandleTypeDef* uart,
 
 CHIL_STATUS __cti_tilt05_convert_acc(cti_tilt05_config* config, int16_t* acc_pointer) {
 	// Check the block format
+	uint8_t index = 1;
+	uint16_t modifier = 1000;
+	int16_t tmp_value = 0;
+	// Process
 	if (config->block[5] != ',') return CHIL_ERROR;
-	if (config->block[0] != '-' || config->block[0] != '+') return CHIL_ERROR;
+	if (config->block[0] != '-' && config->block[0] != '+') return CHIL_ERROR;
 	// This assumes we have a valid block of the form...
 	// SXXXX,
 	// where S is the sign (+, -) and XXXX is the acceleration in mg
-	// so we stuff a NULL character at the end of the string in place
-	// of the comma to read it using sccanf
-	config->block[5] = 0;
-	sscanf(config->block + 1, "%d", acc_pointer);
+	while (index < config->block_index && index < CTI_TILT05_MAX_BLOCK_LENGTH && modifier > 0) {
+		tmp_value += modifier * (config->block[index] - (uint8_t)'0');
+		modifier /= 10;
+		index++;
+	}
+
 	// Convert the sign - assume positive for anything except '-'
-	*acc_pointer *= (*acc_pointer) * (config->block[0] == '-' ? -1 : 1);
+	*acc_pointer = (tmp_value) * (config->block[0] == '-' ? -1 : 1);
 	return CHIL_OK;
 }
 
 CHIL_STATUS __cti_tilt05_convert_pitchroll(cti_tilt05_config* config, int16_t* acc_pointer) {
 	// Check the block format
+	uint8_t index = 1;
+	uint16_t modifier = 1000;
+	int16_t tmp_value = 0;
+	// Process
 	if (config->block[4] != '.') return CHIL_ERROR;
 	if (config->block[6] != ',') return CHIL_ERROR;
-	if (config->block[0] != '-' || config->block[0] != '+') return CHIL_ERROR;
+	if (config->block[0] != '-' && config->block[0] != '+') return CHIL_ERROR;
 	// This assumes we have a valid block of the form...
 	// SIII.D,
 	// where S is the sign (+, -), III is the integer part and D is the
 	// decimal part so we stuff a NULL character at the end of the string
 	//in place of the comma to read it using sccanf
-	config->block[6] = 0;
-	uint16_t integer = 0, decimal = 0;
-	sscanf(config->block + 1, "%d.%d", &integer, &decimal);
-	// Recombine integer and decimal parts
-	*acc_pointer = integer * 10 + decimal;
+	while (index < 4 && index < CTI_TILT05_MAX_BLOCK_LENGTH && modifier > 1) {
+		tmp_value += modifier * (config->block[index] - (uint8_t)'0');
+		modifier /= 10;
+		index++;
+	}// Recombine integer and decimal parts
+	if (index != 4) return CHIL_ERROR; // this should be the decimal place
+	index++;
+
+	tmp_value += (config->block[index] - (uint8_t)'0');
 	// Convert the sign - assume positive for anything except '-'
-	*acc_pointer *= (*acc_pointer) * (config->block[0] == '-' ? -1 : 1);
+	*acc_pointer = (tmp_value) * (config->block[0] == '-' ? -1 : 1);
 	return CHIL_OK;
 }
 
 CHIL_STATUS __cti_tilt05_convert_temp(cti_tilt05_config* config, int8_t* temp_pointer) {
 	// Check the block format
+	uint8_t index = 1;
+	uint16_t modifier = 100;
+	int16_t tmp_value = 0;
+	// Process
 	if (config->block[4] != '*') return CHIL_ERROR;
-	if (config->block[0] != '-' || config->block[0] != '+') return CHIL_ERROR;
+	if (config->block[0] != '-' && config->block[0] != '+') return CHIL_ERROR;
 	// This assumes we have a valid block of the form...
 	// SIII,
 	// where S is the sign (+, -) and III is the integer part
 	// so we stuff a NULL character at the end of the string
 	// in place of the comma to read it using sccanf
-	config->block[4] = 0;
-	sscanf(config->block + 1, "%d", &temp_pointer);
+	while (index < config->block_index && index < CTI_TILT05_MAX_BLOCK_LENGTH && modifier > 0) {
+		tmp_value += modifier * (config->block[index] - (uint8_t)'0');
+		modifier /= 10;
+		index++;
+	}
 	// Convert the sign - assume positive for anything except '-'
-	*temp_pointer *= (*temp_pointer) * (config->block[0] == '-' ? -1 : 1);
+	*temp_pointer = (tmp_value) * (config->block[0] == '-' ? -1 : 1);
 	return CHIL_OK;
 }
 
 CHIL_STATUS __cti_tilt05_state(cti_tilt05_config* config) {
-
-	__HAL_UART_CLEAR_FLAG(config->uart, UART_CLEAR_OREF);
-	__HAL_UART_CLEAR_FLAG(config->uart, UART_CLEAR_FEF);
 
 	switch (config->state) {
 		//
@@ -201,39 +200,41 @@ CHIL_STATUS __cti_tilt05_state(cti_tilt05_config* config) {
 	case START : {
 		// Setup message
 		uint8_t buffer[8];
+		__HAL_UART_FLUSH_DRREGISTER(config->uart);
+		__HAL_UART_CLEAR_FLAG(config->uart, UART_CLEAR_OREF);
+		__HAL_UART_CLEAR_FLAG(config->uart, UART_CLEAR_FEF);
+
 		sprintf(buffer, "[%cMIS\r", '0' + config->unit_id);
 		// Request measurement
-		__HAL_UART_FLUSH_DRREGISTER(config->uart);
 		HAL_StatusTypeDef status = HAL_UART_Transmit(config->uart, buffer, 6, CTI_TILT05_TIMEOUT);
-		HAL_Delay(20);
-		status = HAL_UART_Transmit(config->uart, buffer, 6, CTI_TILT05_TIMEOUT);
-		HAL_Delay(20);
 		if (status != HAL_OK) {
 			config->state = IDLE;
 			return CHIL_ERROR;
 		}
-		// Setup block and message indices
+		memset(config->rx_buffer, 0, CTI_TILT05_BUFFER_RX);
+
+		// Read in the data
+		uint8_t received = 0;
+		status = HAL_UARTEx_ReceiveToIdle(config->uart, config->rx_buffer, CTI_TILT05_BUFFER_RX, &received, CTI_TILT05_TIMEOUT);
+
 		config->block_index = 0;
+		config->rx_buffer_index = 0;
 		config->message_index = 0;
 		config->block_type = MESSAGE_IDENT;
 		// Prepare to read block of MESSAGE_IDENT
 		config->state = READ_BLOCK;
+
 		return CHIL_OK;
 
 	}; break;
 
 	case READ_BLOCK : {
 
-		HAL_StatusTypeDef status = HAL_UART_Receive(config->uart, config->block + config->block_index, 1, CTI_TILT05_TIMEOUT);
-
-		if (status != HAL_OK)  {
-			config->state = IDLE; return CHIL_ERROR;
-		}
-
-		if (config->block[config->block_index] == 0) return CHIL_OK;
+		// Read config block
+		config->block[config->block_index] = config->rx_buffer[config->rx_buffer_index++];
 
 		// Compute checksum with last read character
-		if (config->block[config->block_index] != '*' || config->block[config->block_index] != '$')
+		if (config->block[config->block_index] != '*' && config->block[config->block_index] != '$')
 			config->checksum ^= config->block[config->block_index];
 
 		// Setup the acceleration field pointer if we need it
@@ -259,11 +260,12 @@ CHIL_STATUS __cti_tilt05_state(cti_tilt05_config* config) {
 		// Check what type of block we have
 		switch (config->block_type) {
 			case MESSAGE_IDENT: {
-				if (strcmp(config->block, "$CSTLT,")) {
+				if (strcmp((char*)config->block, "$CSTLT,") == 0) {
 					config->block_type = ACC_X;
 					// Reset the block
 					config->block_index = 0;
 					memset(config->block, 0, CTI_TILT05_MAX_BLOCK_LENGTH);
+					return CHIL_OK;
 				} // otherwise, we carry on reading and deal with
 				  // running out of characters below.
 			}; break;
@@ -272,7 +274,7 @@ CHIL_STATUS __cti_tilt05_state(cti_tilt05_config* config) {
 			case ACC_Z: {
 				if (config->block[config->block_index] == ',') {
 					// we're at the end of the current block
-					if (__cti_tilt05_convert_acc(config->block, acc_pointer) != CHIL_OK) {
+					if (__cti_tilt05_convert_acc(config, acc_pointer) != CHIL_OK) {
 						config->state = IDLE;
 						return CHIL_ERROR;
 					} else {
@@ -281,6 +283,7 @@ CHIL_STATUS __cti_tilt05_state(cti_tilt05_config* config) {
 						config->block_type++;
 						config->block_index = 0;
 						memset(config->block, 0, CTI_TILT05_MAX_BLOCK_LENGTH);
+						return CHIL_OK;
 					}
 				};
 			} break;
@@ -288,7 +291,7 @@ CHIL_STATUS __cti_tilt05_state(cti_tilt05_config* config) {
 			case ROLL: {
 				if (config->block[config->block_index] == ',') {
 					// we're at the end of the current block
-					if (__cti_tilt05_convert_pitchroll(config->block, acc_pointer) != CHIL_OK) {
+					if (__cti_tilt05_convert_pitchroll(config, acc_pointer) != CHIL_OK) {
 						config->state = IDLE;
 						return CHIL_ERROR;
 					} else {
@@ -297,13 +300,14 @@ CHIL_STATUS __cti_tilt05_state(cti_tilt05_config* config) {
 						config->block_type++;
 						config->block_index = 0;
 						memset(config->block, 0, CTI_TILT05_MAX_BLOCK_LENGTH);
+						return CHIL_OK;
 					}
 				};
 			} break;
 			case (TEMP) : {
 				if (config->block[config->block_index] == '*') {
 					// we're at the end of the current block
-					if (__cti_tilt05_convert_temp(config->block, temp_pointer) != CHIL_OK) {
+					if (__cti_tilt05_convert_temp(config, temp_pointer) != CHIL_OK) {
 						config->state = IDLE;
 						return CHIL_ERROR;
 					} else {
@@ -318,18 +322,25 @@ CHIL_STATUS __cti_tilt05_state(cti_tilt05_config* config) {
 
 		// Check if we reached the end of the feasible block read, quit
 		config->block_index++;
-		if (config->block_index >= CTI_TILT05_MAX_BLOCK_LENGTH)
-			config->state = IDLE; return CHIL_ERROR;
+		if (config->block_index >= CTI_TILT05_MAX_BLOCK_LENGTH) {
+			config->state = IDLE;
+			return CHIL_ERROR;
+		}
 
 		return CHIL_OK;
 
 	} break;
 
 	case READ_CHECKSUM: {
-		HAL_StatusTypeDef status = HAL_UART_Receive(config->uart, config->block, 2, CTI_TILT05_TIMEOUT);
-		if (status != HAL_OK) {
-			config->state = IDLE; return CHIL_ERROR;
+		uint8_t checksum = 0;
+		checksum += (config->rx_buffer[config->rx_buffer_index++] - '0') * 16;
+		checksum += (config->rx_buffer[config->rx_buffer_index++] - '0');
+
+		if (config->checksum != checksum) {
+			config->state = IDLE;
+			return CHIL_ERROR;
 		}
+
 		// Skip checking at this stage
 		config->state = READ_CRLF;
 		return CHIL_OK;
@@ -337,11 +348,13 @@ CHIL_STATUS __cti_tilt05_state(cti_tilt05_config* config) {
 	} break;
 
 	case READ_CRLF: {
-		HAL_StatusTypeDef status = HAL_UART_Receive(config->uart, config->block, 2, CTI_TILT05_TIMEOUT);
-		if (status != HAL_OK) {
-			config->state = IDLE; return CHIL_ERROR;
-		}
-		if (strcmp((char*)config->block, "\r\n")) {
+
+		memset(config->block, 0, CTI_TILT05_MAX_BLOCK_LENGTH);
+		config->block_index = 0;
+		config->block[config->block_index++] = config->rx_buffer[config->rx_buffer_index++];
+		config->block[config->block_index] = config->rx_buffer[config->rx_buffer_index];
+
+		if (strcmp((char*)config->block, "\r\n") == 0) {
 			config->result->valid = 1;
 			config->state = IDLE;
 			return CHIL_OK;
@@ -358,6 +371,20 @@ CHIL_STATUS __cti_tilt05_state(cti_tilt05_config* config) {
 
 	return CHIL_ERROR;
 
+}
+
+void cti_tilt05_TxCpltCallback(UART_HandleTypeDef* uart, cti_tilt05_config* config) {
+	// Check we are in the same UART
+	if (uart == config->uart) {
+		config->tx_busy = 0;
+	}
+}
+
+void cti_tilt05_RxCpltCallback(UART_HandleTypeDef* uart, cti_tilt05_config* config)  {
+	// Check we are in the same UART
+	if (uart == config->uart) {
+		config->rx_busy = 0;
+	}
 }
 
 CHIL_STATUS cti_tiil05_measure(cti_tilt05_config* config, cti_tilt05_result* result) {
@@ -385,7 +412,7 @@ CHIL_STATUS cti_tiil05_measure(cti_tilt05_config* config, cti_tilt05_result* res
 	__HAL_UART_FLUSH_DRREGISTER(config->uart);
 
 	// And return okay if we have a valid result!
-	if (result->valid) return CHIL_OK;
+	if (result->valid) return CHIL_OK; else return CHIL_ERROR;
 
 
 }

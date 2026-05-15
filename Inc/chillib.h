@@ -8,7 +8,8 @@
 
 typedef enum {
 	CHIL_OK = 0,
-	CHIL_ERROR = 1
+	CHIL_ERROR = 1,
+	CHIL_TIMEOUT = 2
 } CHIL_STATUS;
 
 #define DEBUG_ENABLE

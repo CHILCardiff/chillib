@@ -15,15 +15,28 @@
 #include "stm32l4xx_hal_uart_ex.h"
 
 #ifndef CTI_TILT05_TIMEOUT
-#define CTI_TILT05_TIMEOUT 1000
+#define CTI_TILT05_TIMEOUT 250
 #endif
 
 #ifndef CTI_TILT05_MAX_BLOCK_LENGTH
 #define CTI_TILT05_MAX_BLOCK_LENGTH 8
 #endif
 
+#ifndef CTI_TILT05_BUFFER_TX
+#define CTI_TILT05_BUFFER_TX 8
+#endif
+
+#ifndef CTI_TILT05_BUFFER_RX
+#define CTI_TILT05_BUFFER_RX 64
+#endif
+
 typedef enum cti_tilt05_state {
 	IDLE,
+	// Initialisation states
+	INIT,
+	WRITE_COMMAND,
+	WAIT_RESPONSE,
+	// Measure states
 	START,
 	READ_BLOCK,
 	READ_CHECKSUM,
@@ -31,6 +44,7 @@ typedef enum cti_tilt05_state {
 } cti_tilt05_state;
 
 typedef enum cti_tilt05_block_type {
+	// Measure states
 	MESSAGE_IDENT = 0,
 	ACC_X = 1,
 	ACC_Y = 2,
@@ -38,6 +52,8 @@ typedef enum cti_tilt05_block_type {
 	PITCH = 4,
 	ROLL = 5,
 	TEMP = 6
+	// Init states
+
 } cti_tilt05_block_type;
 
 typedef struct cti_tilt05_result {
@@ -60,6 +76,12 @@ typedef struct cti_tilt05_config {
 
 	// UART handle
 	UART_HandleTypeDef*            uart;
+	uint16_t                       uart_timeout;
+	volatile uint8_t               rx_busy;
+	uint8_t                        rx_buffer[CTI_TILT05_BUFFER_RX];
+	uint8_t                        rx_buffer_index;
+	volatile uint8_t               tx_busy;
+	uint8_t                        tx_buffer[CTI_TILT05_BUFFER_TX];
 
 	// Sensor variables
 	volatile cti_tilt05_state      state;
@@ -68,12 +90,15 @@ typedef struct cti_tilt05_config {
 	uint8_t                        unit_id;
 
 	// Processing variables
-	uint8_t block[CTI_TILT05_MAX_BLOCK_LENGTH];
+	volatile uint8_t block[CTI_TILT05_MAX_BLOCK_LENGTH];
 	uint8_t block_index;
 	uint8_t message_index;
 	uint8_t checksum;
 
 } cti_tilt05_config;
+
+void cti_tilt05_TxCpltCallback(UART_HandleTypeDef* uart, cti_tilt05_config* config);
+void cti_tilt05_RxCpltCallback(UART_HandleTypeDef* uart, cti_tilt05_config* config);
 
 uint8_t cti_tilt05_sanitise_data_rate(uint8_t data_rate_Hz);
 uint8_t cti_tilt05_sanitise_accelerometer_range(uint8_t acc_range);
