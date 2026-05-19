@@ -10,6 +10,8 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stdio.h"
+
+#ifdef STM32L433xx
 #include "string.h"
 #include "cti_tilt05.h"
 
@@ -77,7 +79,6 @@ CHIL_STATUS cti_tilt05_init(cti_tilt05_config* config, UART_HandleTypeDef* uart,
 		return CHIL_ERROR;
 	}
 	status = HAL_UARTEx_ReceiveToIdle(config->uart, config->rx_buffer, CTI_TILT05_BUFFER_RX, &received, CTI_TILT05_TIMEOUT);
-	DEBUG_PRINTF("[After 1MIX]: %s\n", config->rx_buffer);
 
 	sprintf(config->tx_buffer, "[%cMAX\r", '0' + config->unit_id);
 	status = HAL_UART_Transmit(config->uart, config->tx_buffer, 6, CTI_TILT05_TIMEOUT);
@@ -85,7 +86,6 @@ CHIL_STATUS cti_tilt05_init(cti_tilt05_config* config, UART_HandleTypeDef* uart,
 		return CHIL_ERROR;
 	}
 	status = HAL_UARTEx_ReceiveToIdle(config->uart, config->rx_buffer, CTI_TILT05_BUFFER_RX, &received, CTI_TILT05_TIMEOUT);
-	DEBUG_PRINTF("[After 1MAX]: %s\n", config->rx_buffer);
 
 	sprintf(config->tx_buffer, "[%cD20\r", '0' + config->unit_id);
 	status = HAL_UART_Transmit(config->uart, config->tx_buffer, 6, CTI_TILT05_TIMEOUT);
@@ -93,21 +93,6 @@ CHIL_STATUS cti_tilt05_init(cti_tilt05_config* config, UART_HandleTypeDef* uart,
 		return CHIL_ERROR;
 	}
 	status = HAL_UARTEx_ReceiveToIdle(config->uart, config->rx_buffer, CTI_TILT05_BUFFER_RX, &received, CTI_TILT05_TIMEOUT);
-	DEBUG_PRINTF("[After 1MAX]: %s\n", config->rx_buffer);
-
-//	__HAL_UART_FLUSH_DRREGISTER(config->uart);
-//	__HAL_UART_CLEAR_FLAG(config->uart, UART_CLEAR_OREF);
-//	__HAL_UART_CLEAR_FLAG(config->uart, UART_CLEAR_FEF);
-
-//	sprintf(config->tx_buffer, "[%cMAX\r", '0' + config->unit_id);
-//	status = HAL_UART_Transmit(config->uart, config->tx_buffer, 6, CTI_TILT05_TIMEOUT);
-//	status = HAL_UARTEx_ReceiveToIdle(config->uart, config->rx_buffer, CTI_TILT05_BUFFER_RX, &received, CTI_TILT05_TIMEOUT);
-//	DEBUG_PRINTF("[After 1MAX]: %s\n", config->rx_buffer);
-
-//	while (received > 0) {
-//		HAL_UARTEx_ReceiveToIdle(config->uart, config->rx_buffer, CTI_TILT05_BUFFER_RX, &received, CTI_TILT05_TIMEOUT);
-//		if (received > 0) DEBUG_PRINTF("%s\n", config->rx_buffer);
-//	}
 
 	return CHIL_OK;
 
@@ -416,3 +401,5 @@ CHIL_STATUS cti_tiil05_measure(cti_tilt05_config* config, cti_tilt05_result* res
 
 
 }
+
+#endif

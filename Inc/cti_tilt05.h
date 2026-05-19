@@ -10,6 +10,8 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "chillib.h"
+
+#ifdef STM32L433xx
 #include "stm32l4xx_hal.h"
 #include "stm32l4xx_hal_uart.h"
 #include "stm32l4xx_hal_uart_ex.h"
@@ -108,3 +110,5 @@ CHIL_STATUS cti_tilt05_init(cti_tilt05_config* config, UART_HandleTypeDef* uart,
 CHIL_STATUS __cti_tilt05_state(cti_tilt05_config* config);
 
 CHIL_STATUS cti_tiil05_measure(cti_tilt05_config* config, cti_tilt05_result* result);
+
+#endif
