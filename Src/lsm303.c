@@ -6,6 +6,7 @@
  */
 
 #include "chillib.h"
+#ifdef STM32L433xx
 #include "lsm303.h"
 
 CHIL_STATUS lsm303_init_config(lsm303_config* config, I2C_HandleTypeDef* i2c, uint8_t buffer_length) {
@@ -150,3 +151,5 @@ CHIL_STATUS read_lsm303_acc_data(lsm303_config* config, lsm303_data_3axis* data)
 CHIL_STATUS read_lsm303_mag_data(lsm303_config* config, lsm303_data_3axis* data) {
 	return read_lsm303_data(config, data, 1);
 }
+
+#endif
