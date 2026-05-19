@@ -10,8 +10,11 @@
 extern "C" {
 #endif
 
-#include "stm32l4xx_hal.h"
 #include "tmp117.h"
+
+#ifdef STM32L433xx
+
+#include "stm32l4xx_hal.h"
 
 void tmp117_init_full(tmp117_config* config, I2C_HandleTypeDef* i2c, uint8_t i2c_address, uint16_t timeout) {
 
@@ -315,3 +318,4 @@ uint16_t tmp117_get_conversion_time(tmp117_config* config) {
 #ifdef __cplusplus
 }
 #endif
+#endif 

@@ -7,6 +7,7 @@
 #define CHIL_INSTRUMENT_H
 
 #include "chillib.h"
+#ifdef STM32L433xx
 // STM32 HAL includes
 #include "stm32l4xx_hal.h"
 #include "stm32l4xx_hal_i2c.h"
@@ -123,4 +124,5 @@ CHIL_STATUS chil_ec_measure(chil_ec_config* sensor, chil_ec_result* result, uint
 CHIL_STATUS chil_battery_voltage_init(ADC_HandleTypeDef* adc_handle);
 CHIL_STATUS chil_battery_voltage_read(ADC_HandleTypeDef* adc_handle, uint16_t* battery_voltage);
 
+#endif
 #endif

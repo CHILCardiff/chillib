@@ -19,4 +19,8 @@ typedef enum {
 #define DEBUG_PRINTF(...)
 #endif
 
+#ifdef ARDUINO
+#include "Arduino.h"
+#endif
+
 #endif

@@ -110,7 +110,6 @@ CHIL_STATUS write_packet_to_mbus_buffer(chil_packet* packet, uint8_t* buffer) {
 			block_L3_header header = *(block_L3_header*)packet->blocks[bi];
 			length = sizeof(header) + header.block_length;
 		}
-		DEBUG_PRINTF("Writing #%d (%c:%d) @ %d\n", bi, ((uint8_t*)packet->blocks[bi])[0], length, offset);
 		buffer[0] += length;
 		memcpy(buffer + offset, packet->blocks[bi], length);
 		offset += length;

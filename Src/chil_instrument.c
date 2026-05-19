@@ -11,6 +11,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "chillib.h"
 #include "chil_instrument.h"
+#ifdef STM32L433xx
 #include "stm32l4xx_hal.h"
 #include "stm32l4xx_hal_rtc.h"
 
@@ -350,6 +351,9 @@ CHIL_STATUS chil_instrument_init(chil_instrument_config* config, RTC_HandleTypeD
 	// Read sequence and deployment count registers
 	config->transmit_sequence  = HAL_RTCEx_BKUPRead(rtc, CHIL_INSTRUMENT_BKUP_SEQUENCE);
 	config->deployment_packets = HAL_RTCEx_BKUPRead(rtc, CHIL_INSTRUMENT_BKUP_DEPLOYMENT);
+
+	return CHIL_OK;
+
 }
 
 void chil_instrument_sleep(chil_instrument_config* config) {
@@ -372,3 +376,4 @@ void chil_instrument_sleep(chil_instrument_config* config) {
 	// Finally, enter shutdown mode
 	HAL_PWREx_EnterSHUTDOWNMode();
 }
+#endif

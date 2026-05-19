@@ -9,6 +9,8 @@
 #define LSM303_H
 
 #include "chillib.h"
+
+#ifdef STM32L433xx
 #include "stm32l4xx_hal.h"
 #include "stm32l4xx_hal_cortex.h"
 
@@ -228,4 +230,5 @@ void lsm303_callback(lsm303_config* config, uint8_t* buffer);
 uint16_t lsm303_get_sample_rate(lsm303_config* config);
 int16_t lsm303_acc_convert_buffer_to_data(lsm303_config* ecompass_config, uint8_t* lsm303_buffer, uint16_t offset);
 
+#endif
 #endif /* INC_LSM303_H_ */

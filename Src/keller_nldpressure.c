@@ -8,6 +8,7 @@
  */
 #include "keller_nldpressure.h"
 
+#ifdef STM32L433xx
 void keller_pressure_init_full(keller_pressure* sensor, I2C_HandleTypeDef* i2c, uint8_t i2c_addr, uint16_t timeout) {
 
 	// Assign I2C values
@@ -183,3 +184,5 @@ CHIL_STATUS keller_measure(keller_pressure* sensor, keller_pressure_result* resu
 	return CHIL_OK;
 
 }
+
+#endif

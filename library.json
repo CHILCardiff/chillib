@@ -1,0 +1,8 @@
+{
+  "name": "chillib",
+  "version": "0.0.0+20260515135416",
+  "build" : {
+    "srcDir" : "Src",
+    "includeDir" : "Inc"
+  }
+}

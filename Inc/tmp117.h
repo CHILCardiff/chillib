@@ -8,6 +8,8 @@
 #ifndef INC_TMP117_H_
 #define INC_TMP117_H_
 
+#ifdef STM32L433xx
+
 #include "stm32l4xx_hal.h"
 #include "stm32l4xx_hal_i2c.h"
 #include "stm32l4xx_hal_i2c_ex.h"
@@ -114,4 +116,5 @@ uint8_t  tmp117_measure_oneshot_begin(tmp117_config* sensor, tmp117_result* resu
 uint8_t  tmp117_measure_oneshot_block(tmp117_config* sensor, tmp117_result* result, uint8_t max_attempts);
 uint8_t  tmp117_measure_oneshot_check(tmp117_config* sensor, tmp117_result* result);
 
+#endif
 #endif /* INC_TMP117_H_ */

@@ -10,6 +10,8 @@
 #define KELLER_NLD
 
 #include "chillib.h"
+
+#ifdef STM32L433xx
 #include "stm32l4xx_hal.h"
 #include "stm32l4xx_hal_i2c.h"
 #include "stm32l4xx_hal_i2c_ex.h"
@@ -89,4 +91,5 @@ CHIL_STATUS keller_read_memory(keller_pressure* sensor);
 
 CHIL_STATUS keller_measure(keller_pressure* sensor, keller_pressure_result* result);
 
-#endif
+#endif // STM32L433
+#endif // KELLER_H

@@ -10,6 +10,8 @@
 #ifndef CHIL_PACKETS_H
 #define CHIL_PACKETS_H
 
+#include "chillib.h"
+
 // Maximum number of blocks per MBus frame to transmit
 // assuming these all have a block length of zero. The
 // total length of the frame must not exceed 246 bytes.
@@ -37,7 +39,7 @@ typedef struct __attribute__((packed)) block_L1_A_LSM303 {
 	int16_t accelerometer_z;
 } block_L1_A_LSM303;
 
-typedef __attribute__((packed)) struct block_L1_B_BMA400 {
+typedef struct __attribute__((packed)) block_L1_B_BMA400 {
 	uint8_t block_identifier;
 	uint8_t block_length;
 	int16_t accelerometer_x;
