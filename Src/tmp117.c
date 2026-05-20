@@ -315,7 +315,4 @@ uint16_t tmp117_get_conversion_time(tmp117_config* config) {
 //
 //}
 
-#ifdef __cplusplus
-}
-#endif
 #endif 

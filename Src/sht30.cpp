@@ -21,9 +21,9 @@ uint8_t sht30_calculate_crc(uint16_t result) {
 
 }
 
-CHIL_STATUS sht30_read(sht30_config* config, sht30_result* results) {
+CHIL_STATUS sht30_request(sht30_config* config, sht30_result* results)  {
 
-    results->valid = 0;
+     results->valid = 0;
     
     // Begin transmission
     config->i2c_handle->beginTransmission(config->i2c_address);
@@ -31,42 +31,45 @@ CHIL_STATUS sht30_read(sht30_config* config, sht30_result* results) {
     config->i2c_handle->write((uint8_t) config->repeatability);
 
     uint8_t received = config->i2c_handle->endTransmission();
+    return (received == 0) ? CHIL_OK : CHIL_ERROR;
 
-    if (received == 0) {
+}
 
-        // We can request a measurement (max of 12.5ms)
-        delay(15);
+CHIL_STATUS sht30_read(sht30_config* config, sht30_result* results) {
 
-        // See how much data is returned
-        received = config->i2c_handle->requestFrom(config->i2c_address, 6);
+    delay(15);
 
-        if (received == 6) {
-            
-            uint8_t crc;
-            // Read temperature
-            uint16_t tmp_buffer = config->i2c_handle->read();
-            tmp_buffer <<= 8;
-            tmp_buffer |= config->i2c_handle->read();
-            results->temperature = tmp_buffer;
-            // Read CRC byte for temperature
-            crc = config->i2c_handle->read();
+    // We can request a measurement (max of 12.5ms)
 
-            // Read relative humidity
-            tmp_buffer = config->i2c_handle->read();
-            tmp_buffer <<= 8;
-            tmp_buffer |= config->i2c_handle->read();
-            results->humidity = tmp_buffer;
-            // Read CRC byte for relative humdity
-            crc = config->i2c_handle->read();
+    // See how much data is returned
+    uint8_t received = config->i2c_handle->requestFrom(config->i2c_address, 6);
 
-            // until we've deciphered the datasheet we'll ignore the CRC
-            results->valid = 1;
+    if (received == 6) {
+        
+        uint8_t crc;
+        // Read temperature
+        uint16_t tmp_buffer = config->i2c_handle->read();
+        tmp_buffer <<= 8;
+        tmp_buffer |= config->i2c_handle->read();
+        results->temperature = tmp_buffer;
+        // Read CRC byte for temperature
+        crc = config->i2c_handle->read();
 
-            return CHIL_OK;
-            
-        } else return CHIL_ERROR;
+        // Read relative humidity
+        tmp_buffer = config->i2c_handle->read();
+        tmp_buffer <<= 8;
+        tmp_buffer |= config->i2c_handle->read();
+        results->humidity = tmp_buffer;
+        // Read CRC byte for relative humdity
+        crc = config->i2c_handle->read();
 
+        // until we've deciphered the datasheet we'll ignore the CRC
+        results->valid = 1;
+
+        return CHIL_OK;
+        
     } else return CHIL_ERROR;
+
 }
 
 float sht30_temperature_degC(sht30_result* results) {
@@ -78,7 +81,7 @@ float sht30_temperature_degC(sht30_result* results) {
 
 float sht30_relative_humidity(sht30_result* results) {
     if (results->valid)
-        return Serial.println(((float)results->humidity)*175.0/(65535.0)-45);
+        return ((float)results->humidity)*100.0/(65535.0);
     else 
         return (float)0xffffffff;
 }

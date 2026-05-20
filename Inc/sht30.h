@@ -1,10 +1,9 @@
 #ifndef SHT30_H
 #define SHT30_H
 
-#include "chillib.h"
+// #include "chillib.h"
 #include "Arduino.h"
 #include "Wire.h"
-
 
 #ifndef SHT30_I2C_ADDR
 #define SHT30_I2C_ADDR 0x44
@@ -41,6 +40,7 @@ typedef struct sht30_config {
 } sht30_config;
 
 CHIL_STATUS sht30_init(sht30_config* config, TwoWire* i2c);
+CHIL_STATUS sht30_request(sht30_config* config, sht30_result* results);
 CHIL_STATUS sht30_read(sht30_config* config, sht30_result* results);
 float sht30_temperature_degC(sht30_result* results);
 float sht30_relative_humidity(sht30_result* results);

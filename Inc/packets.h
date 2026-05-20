@@ -15,7 +15,7 @@
 // Maximum number of blocks per MBus frame to transmit
 // assuming these all have a block length of zero. The
 // total length of the frame must not exceed 246 bytes.
-#define CHIL_FRAME_MAX_BLOCKS 123
+#define CHIL_FRAME_MAX_BLOCKS 16
 
 // Number of level of blocks that exist (encapsulating
 // sub-blocks
@@ -145,6 +145,7 @@ typedef struct chil_packet {
 	uint8_t stack_level[CHIL_BLOCK_LEVELS+1];
 	uint8_t stack_index;
 } chil_packet ;
+
 /*****************************************************************************/
 /* Function definitions */
 /*****************************************************************************/
@@ -152,5 +153,7 @@ typedef struct chil_packet {
 void chil_instrument_packet_init(chil_packet* packet);
 CHIL_STATUS append_block_to_packet(void* block, uint8_t block_level, chil_packet* packet);
 CHIL_STATUS write_packet_to_mbus_buffer(chil_packet* packet, uint8_t* buffer);
+
+
 
 #endif

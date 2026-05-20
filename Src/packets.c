@@ -12,20 +12,25 @@
 void chil_instrument_packet_init(chil_packet* packet) {
 
 	// Set all blocks to NULL pointers
+	DEBUG_PRINTF("PACKET_INIT\n");
 	for (uint32_t bi = 0; bi < CHIL_FRAME_MAX_BLOCKS; bi++) {
 		packet->blocks[bi] = NULL;
 		packet->block_level[bi] = 0;
 	}
+	DEBUG_PRINTF("BLOCKS_CLEARED\n");
 
 	packet->block_index = 0; // reset block index;
 //	packet-> = 0; // no blocks assigned yet, length = 0
+	DEBUG_PRINTF("BLOCK_INDEX_ZEROED\n");
 
 	for (uint8_t bl = 0; bl < CHIL_BLOCK_LEVELS + 1; bl++) {
 		packet->stack_block[bl] = NULL;
 		packet->stack_level[bl] = 0;
 	}
+	DEBUG_PRINTF("STACK_CLEARED\n");
 	packet->stack_index = 0;
 	packet->stack_level[0] = CHIL_BLOCK_LEVELS + 1;
+	DEBUG_PRINTF("STACK_RESET\n");
 }
 
 CHIL_STATUS append_block_to_packet(void* block, uint8_t block_level, chil_packet* packet) {
@@ -115,5 +120,6 @@ CHIL_STATUS write_packet_to_mbus_buffer(chil_packet* packet, uint8_t* buffer) {
 		offset += length;
 	}
 
-	return CHIL_ERROR; // fail
+	return CHIL_OK; // completed
+
 }
