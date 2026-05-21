@@ -108,7 +108,7 @@ void tmp117_init_full(tmp117_config* config, I2C_HandleTypeDef*, uint8_t i2c_add
 
 uint8_t tmp117_read_configuration(tmp117_config* config);
 uint8_t tmp117_write_configuration(tmp117_config* config);
-
+uint8_t tmp117_set_conversion_mode(tmp117_config* config, uint8_t conversion_mode);
 
 //int16_t 	tmp117_request_temperature(I2C_HandleTypeDef*);
 //uint32_t	tmp117_request_partial_id(I2C_HandleTypeDef*);
