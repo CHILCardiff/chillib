@@ -50,6 +50,11 @@
 #define CHIL_INSTRUMENT_BKUP_DEPLOYMENT 0
 #endif
 
+typedef enum {
+	PACKET_FORMAT_LATEST           = 0,
+	PACKET_FORMAT_PRE2026          = 1
+} chil_packet_format_t;
+
 // Define a system register to keep track of the backup registers
 typedef struct chil_instrument_config {
 	// Keep track of the HAL RTC handle
@@ -60,6 +65,9 @@ typedef struct chil_instrument_config {
 	uint32_t deployment_sleep_period_s;
 	uint32_t long_term_sleep_period_s;
 	uint32_t max_deployment_packets;
+	uint8_t  invert_ec;
+	// Packet format
+	chil_packet_format_t packet_format;
 } chil_instrument_config;
 
 // Limit the number of averages to a maximum value so we can
@@ -102,6 +110,7 @@ typedef struct chil_ec_config {
 
 	uint8_t  averages;
 	chil_ec_result* current_result;
+	uint8_t  invert_ec;
 
 } chil_ec_config;
 
@@ -114,7 +123,7 @@ void chil_instrument_sleep(chil_instrument_config* config);
 /*****************************************************************************/
 /* EC SENSOR                                                                 */
 /*****************************************************************************/
-CHIL_STATUS chil_ec_init(chil_ec_config* sensor, TIM_HandleTypeDef* timer, ADC_HandleTypeDef* adc, OPAMP_HandleTypeDef* opamp, uint32_t timer_pwn_channel, uint32_t timer_adc_channel);
+CHIL_STATUS chil_ec_init(chil_ec_config* sensor, TIM_HandleTypeDef* timer, ADC_HandleTypeDef* adc, OPAMP_HandleTypeDef* opamp, uint32_t timer_pwn_channel, uint32_t timer_adc_channel, uint8_t invert_ec);
 CHIL_STATUS __chil_ec_stm32_hal_setup(chil_ec_config* sensor);
 CHIL_STATUS chil_ec_measure(chil_ec_config* sensor, chil_ec_result* result, uint8_t averages);
 

@@ -8,6 +8,8 @@
 #ifndef INC_TMP117_H_
 #define INC_TMP117_H_
 
+#include "chillib.h"
+
 #ifdef STM32L433xx
 
 #include "stm32l4xx_hal.h"

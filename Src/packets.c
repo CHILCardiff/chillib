@@ -6,8 +6,18 @@
  * Created on: May 7, 2026
  *      Author: J. D. Hawkins
  */
+ 
+#ifdef ARDUINO
+#include "Arduino.h"
+#else
+    #ifdef STM32L433xx
+    #include "stm32l433xx.h"
+    #endif
+#endif
+
 #include "packets.h"
-#include "string.h"
+
+// #include "string.h"
 
 void chil_instrument_packet_init(chil_packet* packet) {
 
@@ -36,11 +46,11 @@ void chil_instrument_packet_init(chil_packet* packet) {
 CHIL_STATUS append_block_to_packet(void* block, uint8_t block_level, chil_packet* packet) {
 
 	// Fail if we provide an invalid block level
-	if (block_level < 1 || block_level > CHIL_BLOCK_LEVELS) return 1;
+	if (block_level < 1 || block_level > CHIL_BLOCK_LEVELS) return CHIL_ERROR;
 
 	// We also can't add a block if the current level is greater than the new level by 2
 	// unless we're at the beginning
-	if (packet->stack_level[packet->stack_index] - block_level > 1 && packet->stack_index > 0) return 1;
+	if (packet->stack_level[packet->stack_index] - block_level > 1 && packet->stack_index > 0) return CHIL_ERROR;
 
 	if (block_level > packet->stack_level[packet->stack_index]) {
 		// Finish up with the current packet
@@ -121,5 +131,6 @@ CHIL_STATUS write_packet_to_mbus_buffer(chil_packet* packet, uint8_t* buffer) {
 	}
 
 	return CHIL_OK; // completed
+
 
 }

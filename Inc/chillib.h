@@ -21,6 +21,10 @@ typedef enum {
 
 #ifdef ARDUINO
 #include "Arduino.h"
+#else
+#ifdef STM32L433xx
+#include "stm32l4xx.h"
+#endif
 #endif
 
 #endif

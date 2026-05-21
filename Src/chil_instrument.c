@@ -119,7 +119,11 @@ CHIL_STATUS __chil_ec_stm32_hal_setup(chil_ec_config* sensor) {
 		return CHIL_ERROR;
 	}
 	sConfigOC.OCMode = TIM_OCMODE_TOGGLE;
-	sConfigOC.Pulse = 250;
+	// The invert_ec flag lets us swap whether the EC value is written on the
+	// negative or positive side of the PWM wave.
+	// By adding 500 to the .Pulse parameter, we move from one to the other
+	// and hence can program the sensor to use a consistent ADC reading.
+	sConfigOC.Pulse = 250 + ((sensor->invert_ec == 0) ? 0 : 500);
 	if (HAL_TIM_OC_ConfigChannel(sensor->timer_handle, &sConfigOC, TIM_CHANNEL_4) != HAL_OK)
 	{
 		return CHIL_ERROR;
@@ -168,7 +172,8 @@ CHIL_STATUS chil_ec_init(
 	ADC_HandleTypeDef* adc,
 	OPAMP_HandleTypeDef* opamp,
 	uint32_t timer_pwm_channel,
-	uint32_t timer_adc_channel
+	uint32_t timer_adc_channel,
+	uint8_t invert_ec
 ) {
 
 	// Assign parameters
@@ -182,6 +187,8 @@ CHIL_STATUS chil_ec_init(
 	// Assign other HAL handles
 	sensor->adc_handle = adc;
 	sensor->opamp_handle = opamp;
+
+	sensor->invert_ec = invert_ec;
 
 	return __chil_ec_stm32_hal_setup(sensor);
 

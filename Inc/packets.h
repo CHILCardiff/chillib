@@ -12,6 +12,10 @@
 
 #include "chillib.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // Maximum number of blocks per MBus frame to transmit
 // assuming these all have a block length of zero. The
 // total length of the frame must not exceed 246 bytes.
@@ -24,9 +28,9 @@
 // Define a default control layer value
 #define CHIL_DEFAULT_CI_FIELD 0xAC
 
-#include "keller_nldpressure.h"
-#include "lsm303.h"
-#include "tmp117.h"
+// #include "keller_nldpressure.h"
+// #include "lsm303.h"
+// #include "tmp117.h"
 
 typedef struct __attribute__((packed)) block_L1_A_LSM303 {
 	uint8_t block_identifier;
@@ -153,7 +157,9 @@ typedef struct chil_packet {
 void chil_instrument_packet_init(chil_packet* packet);
 CHIL_STATUS append_block_to_packet(void* block, uint8_t block_level, chil_packet* packet);
 CHIL_STATUS write_packet_to_mbus_buffer(chil_packet* packet, uint8_t* buffer);
+CHIL_STATUS write_packet_to_l3_buffer(chil_packet* packet, uint8_t* buffer);
 
-
-
+#ifdef __cplusplus
+}
+#endif
 #endif

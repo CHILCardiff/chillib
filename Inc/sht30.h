@@ -1,7 +1,14 @@
 #ifndef SHT30_H
 #define SHT30_H
 
-// #include "chillib.h"
+#include "chillib.h"
+
+#ifdef ARDUINO
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "Arduino.h"
 #include "Wire.h"
 
@@ -45,4 +52,9 @@ CHIL_STATUS sht30_read(sht30_config* config, sht30_result* results);
 float sht30_temperature_degC(sht30_result* results);
 float sht30_relative_humidity(sht30_result* results);
 
+#ifdef __cplusplus
+}
+#endif
+
+#endif
 #endif 
