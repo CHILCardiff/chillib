@@ -1,5 +1,5 @@
 #include "chillib.h"
-#ifdef ARDUINO_PIO
+#ifdef ARDUINO
 
 #include "Arduino.h"
 #include "Wire.h"
@@ -13,6 +13,7 @@ CHIL_STATUS sht30_init(sht30_config* config, TwoWire* i2c) {
     config->clock_stretch = ENABLED;
     config->i2c_address   = SHT30_I2C_ADDR;
     config->i2c_handle    = i2c;
+    Serial.println("# About to initialise I2C (SHT30)");
     i2c->begin();
     return CHIL_OK;
 }

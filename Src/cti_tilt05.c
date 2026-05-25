@@ -70,7 +70,7 @@ CHIL_STATUS cti_tilt05_init(cti_tilt05_config* config, UART_HandleTypeDef* uart,
 	__HAL_UART_CLEAR_FLAG(config->uart, UART_CLEAR_OREF);
 	__HAL_UART_CLEAR_FLAG(config->uart, UART_CLEAR_FEF);
 
-	uint8_t received = 0;
+	uint16_t received = 0;
 	status = HAL_UARTEx_ReceiveToIdle(config->uart, config->rx_buffer, CTI_TILT05_BUFFER_RX, &received, CTI_TILT05_TIMEOUT);
 
 	sprintf(config->tx_buffer, "[%cMIX\r", '0' + config->unit_id);
@@ -199,7 +199,7 @@ CHIL_STATUS __cti_tilt05_state(cti_tilt05_config* config) {
 		memset(config->rx_buffer, 0, CTI_TILT05_BUFFER_RX);
 
 		// Read in the data
-		uint8_t received = 0;
+		uint16_t received = 0;
 		status = HAL_UARTEx_ReceiveToIdle(config->uart, config->rx_buffer, CTI_TILT05_BUFFER_RX, &received, CTI_TILT05_TIMEOUT);
 
 		config->block_index = 0;

@@ -16,8 +16,7 @@
 #endif
 
 #include "packets.h"
-
-// #include "string.h"
+#include "string.h"
 
 void chil_instrument_packet_init(chil_packet* packet) {
 
@@ -107,6 +106,32 @@ CHIL_STATUS append_block_to_packet(void* block, uint8_t block_level, chil_packet
 	}
 
 	return CHIL_OK;
+
+}
+
+uint16_t write_packet_to_buffer(chil_packet* packet, uint8_t* buffer, uint8_t offset) {
+
+	// buffer[0] is our running packet length
+	uint8_t length = 0;
+	uint16_t bytes_written;
+	for (uint8_t bi = 0; bi < packet->block_index; bi++) {
+		if (packet->block_level[bi] < 3) {
+			block_L1L2_header header = *(block_L1L2_header*)packet->blocks[bi];
+			if (packet->block_level[bi] == 2) {
+				length = sizeof(header);
+			} else {
+				length = sizeof(header) + header.block_length;
+			}
+		} else {
+			block_L3_header header = *(block_L3_header*)packet->blocks[bi];
+			length = sizeof(header) + header.block_length;
+		}
+		memcpy(buffer + offset, packet->blocks[bi], length);
+		bytes_written += length;
+		offset += length;
+	}
+
+	return bytes_written; // completed
 
 }
 
