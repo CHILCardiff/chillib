@@ -373,7 +373,7 @@ void chil_instrument_sleep(chil_instrument_config* config) {
 	uint32_t sleep_period_s = config->long_term_sleep_period_s;
 	if (config->deployment_packets < config->max_deployment_packets) {
 		sleep_period_s = config->deployment_sleep_period_s;
-		DEBUG_PRINTF("Sleep mode [DEPLOY (%d)] for %d seconds\n", sleep_period_s, config->deployment_packets);
+		DEBUG_PRINTF("Sleep mode [DEPLOY (%d)] for %d seconds\n", config->deployment_packets, sleep_period_s);
 	} else {
 		DEBUG_PRINTF("Sleep mode [LONG TERM] for %d seconds\n", sleep_period_s);
 	}

@@ -32,6 +32,7 @@ extern "C" {
 // #include "lsm303.h"
 // #include "tmp117.h"
 
+// A = 14
 typedef struct __attribute__((packed)) block_L1_A_LSM303 {
 	uint8_t block_identifier;
 	uint8_t block_length;
@@ -43,6 +44,7 @@ typedef struct __attribute__((packed)) block_L1_A_LSM303 {
 	int16_t accelerometer_z;
 } block_L1_A_LSM303;
 
+// B = 8
 typedef struct __attribute__((packed)) block_L1_B_BMA400 {
 	uint8_t block_identifier;
 	uint8_t block_length;
@@ -51,6 +53,7 @@ typedef struct __attribute__((packed)) block_L1_B_BMA400 {
 	int16_t accelerometer_z;
 } block_L1_B_BMA400;
 
+// C = 9
 typedef struct __attribute__((packed)) block_L1_C_CHIL {
 	uint8_t 	block_identifier;
 	uint8_t 	block_length;
@@ -60,6 +63,7 @@ typedef struct __attribute__((packed)) block_L1_C_CHIL {
 	int16_t 	temperature_tmp117;
 } block_L1_C_CHIL;
 
+// E = 14
 typedef struct __attribute__((packed)) block_L1_E_CHIL {
 	uint8_t 	block_identifier;
 	uint8_t 	block_length;
@@ -69,6 +73,7 @@ typedef struct __attribute__((packed)) block_L1_E_CHIL {
 	uint16_t 	relative_humidity_sht30;
 } block_L1_E_CHIL;
 
+// K = 13
 typedef struct __attribute__((packed)) block_L1_K_Pressure {
 	uint8_t 	block_identifier;
 	uint8_t 	block_length;
@@ -89,6 +94,7 @@ typedef struct __attribute__((packed)) block_L1_T_TILT05 {
 	int16_t	roll;
 } block_L1_T_TILT05;
 
+// V = 16
 typedef struct __attribute__((packed)) block_L1_V_Voltage {
 	uint8_t 	block_identifier;
 	uint8_t 	block_length;
@@ -101,6 +107,7 @@ typedef struct __attribute__((packed)) block_L1_V_Voltage {
 	uint16_t	voltage_channel3_bus;
 } block_L1_V_Voltage;
 
+// M = 14
 typedef struct __attribute__((packed)) block_L2_M_MBus {
 	uint8_t 	block_identifier;
 	uint8_t 	block_length;
@@ -115,6 +122,7 @@ typedef struct __attribute__((packed)) block_L2_M_MBus {
 	uint8_t		rssi_mbus;
 } block_L2_M_MBus;
 
+// R = 2
 typedef struct __attribute__((packed)) block_L2_R_Receiver {
 	uint8_t 	block_identifier;
 	uint8_t 	block_length;
@@ -122,6 +130,7 @@ typedef struct __attribute__((packed)) block_L2_R_Receiver {
 
 // Used for both D and H which are the same at the moment, with the exception
 // of the block_identifier....
+// D/H = 12
 typedef struct __attribute__((packed)) block_L3_Context {
 	uint8_t 	block_identifier;
 	uint16_t 	block_length;
@@ -158,6 +167,7 @@ void chil_instrument_packet_init(chil_packet* packet);
 CHIL_STATUS append_block_to_packet(void* block, uint8_t block_level, chil_packet* packet);
 CHIL_STATUS write_packet_to_mbus_buffer(chil_packet* packet, uint8_t* buffer);
 CHIL_STATUS write_packet_to_l3_buffer(chil_packet* packet, uint8_t* buffer);
+uint16_t write_packet_to_buffer(chil_packet* packet, uint8_t* buffer, uint8_t offset);
 
 #ifdef __cplusplus
 }
