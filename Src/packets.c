@@ -139,7 +139,7 @@ CHIL_STATUS write_packet_to_mbus_buffer(chil_packet* packet, uint8_t* buffer) {
 
 	// buffer[0] is our running packet length
 	uint8_t offset = 2;
-	buffer[1] = 0xAA;
+	buffer[1] = CHIL_CI_FIELD_V2026;
 	buffer[0] = 1;
 	for (uint8_t bi = 0; bi < packet->block_index; bi++) {
 		uint8_t length = 0;

@@ -26,7 +26,8 @@ extern "C" {
 #define CHIL_BLOCK_LEVELS 3
 
 // Define a default control layer value
-#define CHIL_DEFAULT_CI_FIELD 0xAC
+#define CHIL_DEFAULT_CI_FIELD 0xAA
+#define CHIL_CI_FIELD_V2026 0xAB
 
 // #include "keller_nldpressure.h"
 // #include "lsm303.h"
