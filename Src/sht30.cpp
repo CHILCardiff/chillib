@@ -55,7 +55,7 @@ CHIL_STATUS sht30_request(sht30_config* config, sht30_result* results)  {
 
 CHIL_STATUS sht30_read(sht30_config* config, sht30_result* results) {
 
-    delay(150);
+    // delay(150);
 
     // We can request a measurement (max of 12.5ms)
 
@@ -63,6 +63,7 @@ CHIL_STATUS sht30_read(sht30_config* config, sht30_result* results) {
     uint8_t received = config->i2c_handle->requestFrom(config->i2c_address, 6);
 
     if (received == 6) {
+
 
         // Serial.println("Received 6");
         
