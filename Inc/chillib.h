@@ -6,6 +6,8 @@
 #ifndef CHILLIB_H
 #define CHILLIB_H
 
+#include "string.h"
+
 typedef enum {
 	CHIL_OK = 0,
 	CHIL_ERROR = 1,
